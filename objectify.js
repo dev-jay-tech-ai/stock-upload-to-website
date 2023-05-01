@@ -1,4 +1,4 @@
-// [ subject, price, saleprice, color, size, content, imgLinks ]
+// [ title(0), price(1), saleprice(2), color(3), size(4), content(5), imgLinks(6), brand(7), origin(8), material(9), formSize(10) ]
 // const arr = [
 //   '구찌 인터로킹 GG 로고 라운지 팬츠 655177 / (2컬러)​ S1000200',
 //   '1,264,000',
@@ -13,13 +13,9 @@ module.exports = (arr) => {
   let obj = {};
   obj.product = {};
   let product = obj.product;
-  let titleArr = arr[0].replace(' /','/').trim().split('/')[0].split(' ');
-  titleArr.splice(titleArr.length - 1);;
-  let title = titleArr.slice(1).join(' ');
-  let vendor = titleArr.shift();
-  product.title = title;
+  product.title = arr[0];
   product.body_html = arr[5];
-  product.vendor = vendor;
+  product.vendor = arr[7];
   product.product_type = 'Top';
   product.status = 'draft';
   let variants = []; // 배열임

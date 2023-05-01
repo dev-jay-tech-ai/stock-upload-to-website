@@ -21,7 +21,7 @@ function csvToJSON(csv_string){
 const crawler = async () => {
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: ['--window-size=1680,1080', '--disable-notifications']
     });
     const page = await browser.newPage();
@@ -50,6 +50,11 @@ const crawler = async () => {
         const subject = await page.evaluate(() => {
           return document.querySelector('h3._copyable') && document.querySelector('h3._copyable').innerText;
         });
+
+        let titleArr = subject.replace(' /','/').trim().split('/')[0].split(' ');
+        titleArr.splice(titleArr.length - 1);
+        let title = titleArr.slice(1).join(' ');
+
         const price = await page.evaluate(() => {
           return document.querySelector('del ._1LY7DqCnwR') && document.querySelector('del ._1LY7DqCnwR').innerText;
         });
@@ -60,13 +65,11 @@ const crawler = async () => {
         const color = await page.evaluate(() => {
           return document.querySelector('button[class*=optcolor]') && Array.from(document.querySelectorAll('button[class*=optcolor]')).map((col) => col.innerText).join();
         });
-        // return document.querySelector('button[class*=optsize]') && Array.from(document.querySelectorAll('button[class*=optsize]')).map((s) => s.innerText).filter((s) => s.indexOf('품절') === -1).join();
 
-        await page.evaluate(() => {
-          let radio = document.querySelector('button[class*=optcolor]');
-          radio.click();
+        const size = await page.evaluate(() => {
+          return document.querySelector('button[class*=optsize]') && Array.from(document.querySelectorAll('button[class*=optsize]')).map((s) => s.innerText).filter((s) => s.indexOf('품절') === -1).join();
         });
-        /*
+        
         await page.setDefaultNavigationTimeout(9000);
         await page.evaluate(async () => {
           await new Promise((resolve) => {
@@ -82,8 +85,8 @@ const crawler = async () => {
               }
             }, 300);
           });
-        
-      
+        });
+          
         const content = await page.evaluate(() => {
           return document.querySelector('.se-text-paragraph.se-text-paragraph-align-center') && Array.from(document.querySelectorAll('.se-text-paragraph.se-text-paragraph-align-center')).map((a) => a.innerText );
         });
@@ -93,14 +96,14 @@ const crawler = async () => {
         });
         let imgLinks = [];
         img.forEach((m,idx) => { if(idx>2 && idx<img.length-2) imgLinks.push(m) });
-        results.push([subject, price, saleprice, options, content.join(), imgLinks.join()]);*/
+        results.push([ title, price, saleprice, color, size , content.join(), imgLinks.join()]);
       }
     }   
     // console.log(results);
-    // await page.close();
-    // await browser.close();
+    await page.close();
+    await browser.close();
 
-    // await createData(results);
+    await createData(results);
   }
    catch(err) {
     console.log(err)
